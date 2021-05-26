@@ -1,3 +1,9 @@
+/*
+ * Title:        iFogSim Toolkit
+ * Description:  iFogSim (Cloud Simulation) Toolkit for Modeling and Simulation of Clouds
+ *
+ */
+
 package org.fog.application;
 
 import java.util.ArrayList;
@@ -10,6 +16,7 @@ import org.cloudbus.cloudsim.CloudletScheduler;
 import org.cloudbus.cloudsim.power.PowerVm;
 import org.fog.application.selectivity.SelectivityModel;
 import org.fog.scheduler.TupleScheduler;
+import org.fog.utils.AppModuleAddress;
 import org.fog.utils.FogUtils;
 
 /**
@@ -18,7 +25,6 @@ import org.fog.utils.FogUtils;
  *
  */
 public class AppModule extends PowerVm{
-
 	private String name;
 	private String appId;
 	private Map<Pair<String, String>, SelectivityModel> selectivityMap;
@@ -28,6 +34,11 @@ public class AppModule extends PowerVm{
 	 * If a new instance ID is detected, the number of instances is incremented.  
 	 */
 	private Map<String, List<Integer>> downInstanceIdsMaps;
+	
+	/**
+	 * Map from tuple type to addresses of modules that will receive those messages
+	 */
+	private Map<String, List<AppModuleAddress>> destModules;
 	
 	/**
 	 * Number of instances of this module
@@ -74,7 +85,9 @@ public class AppModule extends PowerVm{
 		setActuatorSubscriptions(new HashMap<String, List<Integer>>());
 		setNumInstances(0);
 		setDownInstanceIdsMaps(new HashMap<String, List<Integer>>());
+		setDestModules(new HashMap<String, List<AppModuleAddress>>());
 	}
+	
 	public AppModule(AppModule operator) {
 		super(FogUtils.generateEntityId(), operator.getUserId(), operator.getMips(), 1, operator.getRam(), operator.getBw(), operator.getSize(), 1, operator.getVmm(), new TupleScheduler(operator.getMips(), 1), operator.getSchedulingInterval());
 		setName(operator.getName());
@@ -87,12 +100,14 @@ public class AppModule extends PowerVm{
 		setCurrentAllocatedSize(0);
 		setSelectivityMap(operator.getSelectivityMap());
 		setDownInstanceIdsMaps(new HashMap<String, List<Integer>>());
+		setDestModules(new HashMap<String, List<AppModuleAddress>>());
+		setActuatorSubscriptions(new HashMap<String, List<Integer>>());
 	}
 	
-	public void subscribeActuator(int id, String tuplyType){
-		if(!getActuatorSubscriptions().containsKey(tuplyType))
-			getActuatorSubscriptions().put(tuplyType, new ArrayList<Integer>());
-		getActuatorSubscriptions().get(tuplyType).add(id);
+	public void subscribeActuator(int id, String tupleType){
+		if(!getActuatorSubscriptions().containsKey(tupleType))
+			getActuatorSubscriptions().put(tupleType, new ArrayList<Integer>());
+		getActuatorSubscriptions().get(tupleType).add(id);
 	}
 	
 	public String getName() {
@@ -130,5 +145,16 @@ public class AppModule extends PowerVm{
 	}
 	public void setNumInstances(int numInstances) {
 		this.numInstances = numInstances;
+	}
+	public Map<String, List<AppModuleAddress>> getDestModules() {
+		return destModules;
+	}
+	public void setDestModules(Map<String, List<AppModuleAddress>> destModules) {
+		this.destModules = destModules;
+	}
+	public void addDestModule(String edge, AppModuleAddress destModule) {
+		if (! getDestModules().containsKey(edge))
+			getDestModules().put(edge, new ArrayList<AppModuleAddress>());
+		getDestModules().get(edge).add(destModule);
 	}
 }

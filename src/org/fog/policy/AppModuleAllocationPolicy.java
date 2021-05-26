@@ -1,3 +1,8 @@
+/*
+ * Title:        iFogSim Toolkit
+ * Description:  iFogSim (Cloud Simulation) Toolkit for Modeling and Simulation of Clouds
+ *
+ */
 package org.fog.policy;
 
 import java.util.ArrayList;
@@ -7,12 +12,23 @@ import java.util.Map;
 import org.cloudbus.cloudsim.Host;
 import org.cloudbus.cloudsim.Vm;
 import org.cloudbus.cloudsim.VmAllocationPolicy;
-import org.fog.application.AppModule;
 
+/**
+ * Allocation policy for application modules on a fog device.
+ * @author Harshit Gupta
+ */
 public class AppModuleAllocationPolicy extends VmAllocationPolicy{
 
+	/**
+	 * The physical machine in the fog device.
+	 * Every fog device is modeled as a datacenter with a single host.
+	 */
 	private Host fogHost;
 	
+	/**
+	 * IDs of application modules running on the fog device. 
+	 * ID of an app module is actually the ID of a VM, since AppModule class extends Vm.
+	 */
 	private List<Integer> appModuleIds;
 	
 	public AppModuleAllocationPolicy(List<? extends Host> list) {
@@ -24,12 +40,11 @@ public class AppModuleAllocationPolicy extends VmAllocationPolicy{
 
 	@Override
 	public boolean allocateHostForVm(Vm vm) {
-		Host host = fogHost;
-		boolean result = host.vmCreate(vm);
+		Host host = fogHost; // since fog device has only one physical machine
+		boolean result = host.vmCreate(vm); // try allocating resources for the VM in given host
 		if (result) { // if vm were succesfully created in the host
 			getAppModuleIdsIds().add(vm.getId());
 		}
-		
 		return result;
 	}
 

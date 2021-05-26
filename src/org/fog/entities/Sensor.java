@@ -1,14 +1,22 @@
+/*
+ * Title:        iFogSim Toolkit
+ * Description:  iFogSim (Cloud Simulation) Toolkit for Modeling and Simulation of Clouds
+ *
+ */
+
 package org.fog.entities;
 
 import java.util.ArrayList;
 
 import org.cloudbus.cloudsim.UtilizationModelFull;
 import org.cloudbus.cloudsim.core.CloudSim;
+import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.SimEntity;
 import org.cloudbus.cloudsim.core.SimEvent;
 import org.fog.application.AppEdge;
 import org.fog.application.AppLoop;
 import org.fog.application.Application;
+import org.fog.utils.AppModuleAddress;
 import org.fog.utils.FogEvents;
 import org.fog.utils.FogUtils;
 import org.fog.utils.GeoLocation;
@@ -17,6 +25,7 @@ import org.fog.utils.TimeKeeper;
 import org.fog.utils.distribution.Distribution;
 
 public class Sensor extends SimEntity{
+	private static String LOG_TAG = "SENSOR";
 	
 	private int gatewayDeviceId;
 	private GeoLocation geoLocation;
@@ -28,11 +37,15 @@ public class Sensor extends SimEntity{
 	private String destModuleName;
 	private Distribution transmitDistribution;
 	private int controllerId;
-	private Application app;
 	private double latency;
+	private SensorCharacteristics characteristics;
+	private Application application;
+	private AppModuleAddress destModuleAddr;
+	private EndDevice device;
+	private int endDeviceId;
 	
 	public Sensor(String name, int userId, String appId, int gatewayDeviceId, double latency, GeoLocation geoLocation, 
-			Distribution transmitDistribution, int cpuLength, int nwLength, String tupleType, String destModuleName) {
+			Distribution transmitDistribution, int cpuLength, int nwLength, String tupleType, String destModuleName, Application application) {
 		super(name);
 		this.setAppId(appId);
 		this.gatewayDeviceId = gatewayDeviceId;
@@ -44,10 +57,14 @@ public class Sensor extends SimEntity{
 		setTupleType(tupleType);
 		setSensorName(sensorName);
 		setLatency(latency);
+		setApplication(application);
+		setCharacteristics(new SensorCharacteristics(getId(), appId, tupleType, transmitDistribution, cpuLength, nwLength, geoLocation));
+		setDestModuleAddr(null);
+		setEndDeviceId(-1);
 	}
 	
 	public Sensor(String name, int userId, String appId, int gatewayDeviceId, double latency, GeoLocation geoLocation, 
-			Distribution transmitDistribution, String tupleType) {
+			Distribution transmitDistribution, String tupleType, Application application) {
 		super(name);
 		this.setAppId(appId);
 		this.gatewayDeviceId = gatewayDeviceId;
@@ -58,7 +75,43 @@ public class Sensor extends SimEntity{
 		setTupleType(tupleType);
 		setSensorName(sensorName);
 		setLatency(latency);
+		setApplication(application);
+		
+		AppEdge _edge = null;
+		for(AppEdge edge : getApplication().getEdges()){
+			if(edge.getSource().equals(getTupleType()))
+				_edge = edge;
+		}
+		int cpuLength = (int) _edge.getTupleCpuLength();
+		int nwLength = (int) _edge.getTupleNwLength();
+		
+		setCharacteristics(new SensorCharacteristics(getId(), appId, tupleType, transmitDistribution, cpuLength, nwLength, geoLocation));
+		setDestModuleAddr(null);
+		setEndDeviceId(-1);
 	}
+	
+	public Sensor(String name, String tupleType, int userId, String appId, Distribution transmitDistribution, Application application) {
+		super(name);
+		this.setAppId(appId);
+		this.setTransmitDistribution(transmitDistribution);
+		setTupleType(tupleType);
+		setSensorName(tupleType);
+		setUserId(userId);
+		setApplication(application);
+		
+		AppEdge _edge = null;
+		for(AppEdge edge : getApplication().getEdges()){
+			if(edge.getSource().equals(getTupleType()))
+				_edge = edge;
+		}
+		int cpuLength = (int) _edge.getTupleCpuLength();
+		int nwLength = (int) _edge.getTupleNwLength();
+		
+		setCharacteristics(new SensorCharacteristics(getId(), appId, tupleType, transmitDistribution, cpuLength, nwLength, null));
+		setDestModuleAddr(null);
+		setEndDeviceId(-1);
+	}
+	
 	
 	/**
 	 * This constructor is called from the code that generates PhysicalTopology from JSON
@@ -76,11 +129,15 @@ public class Sensor extends SimEntity{
 		setTupleType(tupleType);
 		setSensorName(tupleType);
 		setUserId(userId);
+		setDestModuleAddr(null);
+		setEndDeviceId(-1);
 	}
 	
 	public void transmit(){
+		if (getDestModuleAddr() == null) return;
+		
 		AppEdge _edge = null;
-		for(AppEdge edge : getApp().getEdges()){
+		for(AppEdge edge : getApplication().getEdges()){
 			if(edge.getSource().equals(getTupleType()))
 				_edge = edge;
 		}
@@ -94,16 +151,25 @@ public class Sensor extends SimEntity{
 		
 		tuple.setDestModuleName(_edge.getDestination());
 		tuple.setSrcModuleName(getSensorName());
-		Logger.debug(getName(), "Sending tuple with tupleId = "+tuple.getCloudletId());
+		Logger.debug(LOG_TAG, getName(), "Sending tuple with tupleId = "+tuple.getCloudletId());
 
 		int actualTupleId = updateTimings(getSensorName(), tuple.getDestModuleName());
 		tuple.setActualTupleId(actualTupleId);
 		
-		send(gatewayDeviceId, getLatency(), FogEvents.TUPLE_ARRIVAL,tuple);
+		//TODO Correct these
+		//sendTuple(tuple, getDestModuleAddr().getFogDeviceId(), getDestModuleAddr().getVmId());
+		getDevice().sendTuple(tuple, getDestModuleAddr().getFogDeviceId(), getDestModuleAddr().getVmId());
+	}
+	
+	protected void sendTuple(Tuple tuple, int dstDeviceId, int dstVmId) {
+		tuple.setVmId(dstVmId);
+		tuple.setSourceDeviceId(getId());
+		tuple.setDestinationDeviceId(dstDeviceId);
+		send(dstDeviceId, getLatency(), FogEvents.TUPLE_ARRIVAL, tuple);
 	}
 	
 	private int updateTimings(String src, String dest){
-		Application application = getApp();
+		Application application = getApplication();
 		for(AppLoop loop : application.getLoops()){
 			if(loop.hasEdge(src, dest)){
 				
@@ -120,13 +186,19 @@ public class Sensor extends SimEntity{
 	
 	@Override
 	public void startEntity() {
-		send(gatewayDeviceId, CloudSim.getMinTimeBetweenEvents(), FogEvents.SENSOR_JOINED, geoLocation);
+		System.out.println("Starting sensor with ID "+getId());
+		//send(gatewayDeviceId, CloudSim.getMinTimeBetweenEvents(), FogEvents.SENSOR_JOINED, geoLocation);
 		send(getId(), getTransmitDistribution().getNextValue(), FogEvents.EMIT_TUPLE);
 	}
 
 	@Override
 	public void processEvent(SimEvent ev) {
 		switch(ev.getTag()){
+		case CloudSimTags.RESOURCE_CHARACTERISTICS:
+			System.out.println(getName()+" received charac req");
+			int srcId = ((Integer) ev.getData()).intValue();
+			sendNow(srcId, ev.getTag(), getCharacteristics());
+			break;
 		case FogEvents.TUPLE_ACK:
 			//transmit(transmitDistribution.getNextValue());
 			break;
@@ -134,8 +206,16 @@ public class Sensor extends SimEntity{
 			transmit();
 			send(getId(), getTransmitDistribution().getNextValue(), FogEvents.EMIT_TUPLE);
 			break;
+		case FogEvents.ENDPOINT_CONNECTION:
+			AppModuleAddress addr = (AppModuleAddress) ev.getData();
+			processSensorConnection(addr);
+			break;
 		}
 			
+	}
+
+	private void processSensorConnection(AppModuleAddress addr) {
+		setDestModuleAddr(addr);
 	}
 
 	@Override
@@ -215,20 +295,52 @@ public class Sensor extends SimEntity{
 		this.controllerId = controllerId;
 	}
 
-	public Application getApp() {
-		return app;
-	}
-
-	public void setApp(Application app) {
-		this.app = app;
-	}
-
 	public Double getLatency() {
 		return latency;
 	}
 
 	public void setLatency(Double latency) {
 		this.latency = latency;
+	}
+
+	public SensorCharacteristics getCharacteristics() {
+		return characteristics;
+	}
+
+	public void setCharacteristics(SensorCharacteristics characteristics) {
+		this.characteristics = characteristics;
+	}
+
+	public Application getApplication() {
+		return application;
+	}
+
+	public void setApplication(Application application) {
+		this.application = application;
+	}
+
+	public AppModuleAddress getDestModuleAddr() {
+		return destModuleAddr;
+	}
+
+	public void setDestModuleAddr(AppModuleAddress destModuleAddr) {
+		this.destModuleAddr = destModuleAddr;
+	}
+
+	public EndDevice getDevice() {
+		return device;
+	}
+
+	public void setDevice(EndDevice device) {
+		this.device = device;
+	}
+
+	public int getEndDeviceId() {
+		return endDeviceId;
+	}
+
+	public void setEndDeviceId(int endDeviceId) {
+		this.endDeviceId = endDeviceId;
 	}
 
 }

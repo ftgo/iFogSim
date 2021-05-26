@@ -1,3 +1,9 @@
+/*
+ * Title:        iFogSim Toolkit
+ * Description:  iFogSim (Cloud Simulation) Toolkit for Modeling and Simulation of Clouds
+ *
+ */
+
 package org.fog.application;
 
 import java.util.ArrayList;
@@ -56,10 +62,9 @@ public class Application {
 	 * @param moduleName
 	 * @param ram
 	 */
-	public void addAppModule(String moduleName, int ram){
-		int mips = 1000;
-		long size = 10000;
-		long bw = 1000;
+	public void addAppModule(String moduleName, long mips, int ram){
+		long size = 1;
+		long bw = 1;
 		String vmm = "Xen";
 		
 		AppModule module = new AppModule(FogUtils.generateEntityId(), moduleName, appId, userId, 
@@ -73,8 +78,8 @@ public class Application {
 	 * Adds a non-periodic edge to the application model.
 	 * @param source
 	 * @param destination
-	 * @param tupleCpuLength
-	 * @param tupleNwLength
+	 * @param tupleCpuLength Number of Million Instructions 
+	 * @param tupleNwLength Transmission size of Tuple in Bytes
 	 * @param tupleType
 	 * @param direction
 	 * @param edgeType
