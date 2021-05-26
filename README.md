@@ -30,3 +30,9 @@ git pull origin master
 
 2. Redowan Mahmud and Rajkumar Buyya, <A href="http://www.buyya.com/papers/iFogSim-Tut.pdf">Modelling and Simulation of Fog and Edge Computing Environments using iFogSim Toolkit</A>, Fog and Edge Computing: Principles and Paradigms, R. Buyya and S. Srirama (eds), 433-466pp, ISBN: 978-111-95-2498-4, Wiley Press, New York, USA, January 2019.
 
+
+# iFogSim (this fork)
+* Better build: `mvn clean install` (no `jars` needed)
+* Merged `improv` branch
+* Includes our own simulation
+
