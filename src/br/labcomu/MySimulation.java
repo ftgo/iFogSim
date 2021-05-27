@@ -24,6 +24,22 @@ import static org.fog.entities.Tuple.DOWN;
 import static org.fog.entities.Tuple.UP;
 
 public class MySimulation extends Simulation {
+	
+	private int latency_endDevicetoSwitch;
+	private int latency_switchtoSwitch;
+	private int latency_switchtoFogDevice;
+	private int latency_switchtoCloudDevice;
+	private int bandwith;
+	
+	public MySimulation(int latency_endDevicetoSwitch, int latency_switchtoSwitch, int latency_switchtoFogDevice,
+			int latency_switchtoCloudDevice, int bandwith) {
+		super();
+		this.latency_endDevicetoSwitch = latency_endDevicetoSwitch;
+		this.latency_switchtoSwitch = latency_switchtoSwitch;
+		this.latency_switchtoFogDevice = latency_switchtoFogDevice;
+		this.latency_switchtoCloudDevice = latency_switchtoCloudDevice;
+		this.bandwith = bandwith;
+	}
 
     /*
      * |    MODULE
@@ -121,12 +137,10 @@ public class MySimulation extends Simulation {
     }
 
     public static void main(String[] args) throws Exception {
-        Simulation simulation = new MySimulation();
-
-        simulation.switchLog(false);
-
-        simulation.initialize();
-
-        simulation.run();
+		Simulation simulation = new MySimulation(10, 50,20, 500, 100);
+		simulation.switchLog(false);
+		simulation.initialize();
+		
+		simulation.run();
     }
 }
