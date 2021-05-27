@@ -52,14 +52,14 @@ public class MySimulation extends Simulation {
         application.addTupleMapping(FOG_DEVICE_TYPE, SENSOR_TYPE, ACTUATOR_TYPE, new FractionalSelectivity(1.0)); // TODO FractionalSelectivity?
 
 
-        ArrayList<String> modules1 = new ArrayList<String>();
-        modules1.add(SENSOR_TYPE);
-        modules1.add(FOG_DEVICE_TYPE);
-        modules1.add(ACTUATOR_TYPE);
-        AppLoop loop1 = new AppLoop(modules1); // TODO AppLoop?
+        ArrayList<String> modules = new ArrayList<String>();
+        modules.add(SENSOR_TYPE);
+        modules.add(FOG_DEVICE_TYPE);
+        modules.add(ACTUATOR_TYPE);
+        AppLoop loop = new AppLoop(modules); // TODO AppLoop?
 
         List<AppLoop> loops = new ArrayList<AppLoop>();
-        loops.add(loop1);
+        loops.add(loop);
 
         application.setLoops(loops);
     }
