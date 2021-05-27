@@ -49,14 +49,14 @@ public class MySimulation extends Simulation {
         /*
          * Defining the input-output relationships (represented by selectivity) of the application modules.
          */
-        application.addTupleMapping(FOG_DEVICE_TYPE, SENSOR_TYPE, ACTUATOR_TYPE, new FractionalSelectivity(1.0));
+        application.addTupleMapping(FOG_DEVICE_TYPE, SENSOR_TYPE, ACTUATOR_TYPE, new FractionalSelectivity(1.0)); // TODO FractionalSelectivity?
 
 
         ArrayList<String> modules1 = new ArrayList<String>();
         modules1.add(SENSOR_TYPE);
         modules1.add(FOG_DEVICE_TYPE);
         modules1.add(ACTUATOR_TYPE);
-        AppLoop loop1 = new AppLoop(modules1);
+        AppLoop loop1 = new AppLoop(modules1); // TODO AppLoop?
 
         List<AppLoop> loops = new ArrayList<AppLoop>();
         loops.add(loop1);
@@ -76,7 +76,7 @@ public class MySimulation extends Simulation {
      * |          /\
      * |     [0] /  \ [1]
      * |        /    \
-     * |     S-0      A-0
+     * |     S-x      A-x
      */
     @Override
     protected void initializeTopology() {
@@ -85,14 +85,13 @@ public class MySimulation extends Simulation {
         SensorBuilder sensorBuilder = createSensorBuilder();
         ActuatorBuilder actuatorBuilder = createActuatorBuilder();
 
-
         EndDevice endDevice = new EndDevice("IOT");
         topology.addEndDevice(endDevice);
 
-        Sensor sensor = sensorBuilder.setTransmissionInterval(5000).build("S-0");
+        Sensor sensor = sensorBuilder.setTransmissionInterval(5000).build("x");
         endDevice.addSensor(sensor);  // [0]
 
-        Actuator actuator = actuatorBuilder.build("A-0");
+        Actuator actuator = actuatorBuilder.build("x");
         endDevice.addActuator(actuator); // [1]
 
         Switch switch0 = new EdgeSwitch("SWITCH0");

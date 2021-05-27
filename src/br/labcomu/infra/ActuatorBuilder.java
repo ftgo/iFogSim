@@ -24,13 +24,13 @@ public class ActuatorBuilder {
         return this;
     }
 
-    public Actuator build(String name) {
+    public Actuator build(String suffix) {
         Application application = this.simulation.getApplication();
 
         int userId = application.getUserId();
         String appId = application.getAppId();
 
-        Actuator actuator = new Actuator(name, userId, appId, this.actuatorType, application);
+        Actuator actuator = new Actuator("A-" + suffix, userId, appId, this.actuatorType, application);
 
         this.simulation.addActuator(actuator);
 

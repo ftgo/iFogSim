@@ -51,13 +51,13 @@ public class SensorBuilder {
         return this;
     }
 
-    public Sensor build(String name) {
+    public Sensor build(String suffix) {
         Application application = this.simulation.getApplication();
 
         int userId = application.getUserId();
         String appId = application.getAppId();
 
-        Sensor sensor = new Sensor(name, this.tupleType, userId, appId, this.distributionFactory.create(this.transmissionInterval), application); // inter-transmission time of EEG sensor follows a deterministic distribution
+        Sensor sensor = new Sensor("S-" + suffix, this.tupleType, userId, appId, this.distributionFactory.create(this.transmissionInterval), application); // inter-transmission time of EEG sensor follows a deterministic distribution
 
         this.simulation.addSensor(sensor);
 
