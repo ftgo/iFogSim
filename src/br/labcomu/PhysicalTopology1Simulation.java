@@ -1,6 +1,8 @@
 package br.labcomu;
 
+import br.labcomu.infra.ActuatorBuilder;
 import br.labcomu.infra.FogDeviceBuilder;
+import br.labcomu.infra.SensorBuilder;
 import br.labcomu.infra.Simulation;
 import org.fog.application.AppEdge;
 import org.fog.application.AppLoop;
@@ -10,7 +12,6 @@ import org.fog.entities.*;
 import org.fog.network.EdgeSwitch;
 import org.fog.network.PhysicalTopology;
 import org.fog.network.Switch;
-import org.fog.utils.distribution.DeterministicDistribution;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,12 +69,11 @@ public class PhysicalTopology1Simulation extends Simulation {
         Switch switch2 = new Switch("SW2");
         EndDevice endDevice = new EndDevice("DEV");
 
-        int transmissionInterval = 5000;
-        Sensor sensor = new Sensor("s-0", "SENSED_DATA", userId, appId, new DeterministicDistribution(transmissionInterval), application); // inter-transmission time of EEG sensor follows a deterministic distribution
+        Sensor sensor = new SensorBuilder().setTransmissionInterval(5000).build("s-0", application); // inter-transmission time of EEG sensor follows a deterministic distribution
         addSensor(sensor);
         endDevice.addSensor(sensor);
 
-        Actuator actuator = new Actuator("a-0", userId, appId, "ACTION", application);
+        Actuator actuator = new ActuatorBuilder().build("a-0", application);
         addActuator(actuator);
         endDevice.addActuator(actuator);
 
