@@ -76,7 +76,7 @@ public class MySimulation extends Simulation {
      * |          /\
      * |     [0] /  \ [1]
      * |        /    \
-     * |     SENSOR ACTUATOR
+     * |     S-0      A-0
      */
     @Override
     protected void initializeTopology() {
@@ -89,10 +89,10 @@ public class MySimulation extends Simulation {
         EndDevice endDevice = new EndDevice("IOT");
         topology.addEndDevice(endDevice);
 
-        Sensor sensor = sensorBuilder.setTransmissionInterval(5000).build("SENSOR");
+        Sensor sensor = sensorBuilder.setTransmissionInterval(5000).build("S-0");
         endDevice.addSensor(sensor);  // [0]
 
-        Actuator actuator = actuatorBuilder.build("ACTUATOR");
+        Actuator actuator = actuatorBuilder.build("A-0");
         endDevice.addActuator(actuator); // [1]
 
         Switch switch0 = new EdgeSwitch("SWITCH0");
@@ -124,7 +124,7 @@ public class MySimulation extends Simulation {
     public static void main(String[] args) throws Exception {
         Simulation simulation = new MySimulation();
 
-        simulation.switchLog(false, FOG_DEVICE_LOG, SWITCH_LOG, LINK_LOG, PHYSICAL_TOPOLOGY_LOG);
+        simulation.switchLog(false);
 
         simulation.initialize();
 
