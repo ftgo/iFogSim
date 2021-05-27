@@ -68,14 +68,14 @@ public class MySimulation extends Simulation {
         application.addTupleMapping(FOG_DEVICE_TYPE, SENSOR_TYPE, ACTUATOR_TYPE, new FractionalSelectivity(1.0)); // TODO FractionalSelectivity?
 
 
-        ArrayList<String> modules1 = new ArrayList<String>();
-        modules1.add(SENSOR_TYPE);
-        modules1.add(FOG_DEVICE_TYPE);
-        modules1.add(ACTUATOR_TYPE);
-        AppLoop loop1 = new AppLoop(modules1); // TODO AppLoop?
+        ArrayList<String> modules = new ArrayList<String>();
+        modules.add(SENSOR_TYPE);
+        modules.add(FOG_DEVICE_TYPE);
+        modules.add(ACTUATOR_TYPE);
+        AppLoop loop = new AppLoop(modules); // TODO AppLoop?
 
         List<AppLoop> loops = new ArrayList<AppLoop>();
-        loops.add(loop1);
+        loops.add(loop);
 
         application.setLoops(loops);
     }
@@ -101,43 +101,83 @@ public class MySimulation extends Simulation {
         SensorBuilder sensorBuilder = createSensorBuilder();
         ActuatorBuilder actuatorBuilder = createActuatorBuilder();
 
-        EndDevice endDevice = new EndDevice("IOT");
-        topology.addEndDevice(endDevice);
+        EndDevice iot = new EndDevice("IOT");
+        topology.addEndDevice(iot);
 
-        Sensor sensor = sensorBuilder.setTransmissionInterval(5000).build("x");
-        endDevice.addSensor(sensor);  // [0]
+        Sensor sensorX = sensorBuilder.setTransmissionInterval(5000).build("x");
+        iot.addSensor(sensorX);  // [0]
 
-        Actuator actuator = actuatorBuilder.build("x");
-        endDevice.addActuator(actuator); // [1]
+        Actuator actuatorX = actuatorBuilder.build("x");
+        iot.addActuator(actuatorX); // [1]
 
         Switch switch0 = new EdgeSwitch("SWITCH0");
         topology.addSwitch(switch0);
 
-        topology.addLink(endDevice.getId(), switch0.getId(), 10, 1000); // [2]
+        topology.addLink(iot.getId(), switch0.getId(), getLatency_endDevicetoSwitch(), 1000); // [2]
 
-        FogDevice fogDevice = fogDeviceBuilder.setCloud(false).build("FOG");
-        topology.addFogDevice(fogDevice);
+        FogDevice fog = fogDeviceBuilder.setCloud(false).build("FOG");
+        topology.addFogDevice(fog);
 
-        topology.addLink(switch0.getId(), fogDevice.getId(), 2, 1000); // [3]
+        topology.addLink(switch0.getId(), fog.getId(), getLatency_switchtoFogDevice(), 1000); // [3]
 
         Switch switch1 = new Switch("SWITCH1");
         topology.addSwitch(switch1);
 
-        topology.addLink(switch0.getId(), switch1.getId(), 15, 1000); // [4]
+        topology.addLink(switch0.getId(), switch1.getId(), getLatency_switchtoSwitch(), 1000); // [4]
 
         Switch switch2 = new Switch("SWITCH2");
         topology.addSwitch(switch2);
 
-        topology.addLink(switch1.getId(), switch2.getId(), 20, 1000); // [5]
+        topology.addLink(switch1.getId(), switch2.getId(), getLatency_switchtoSwitch(), 1000); // [5]
 
-        FogDevice cloudDevice = fogDeviceBuilder.setCloud(true).build("CLOUD");
-        topology.addFogDevice(cloudDevice);
+        FogDevice cloud = fogDeviceBuilder.setCloud(true).build("CLOUD");
+        topology.addFogDevice(cloud);
 
-        topology.addLink(switch2.getId(), cloudDevice.getId(), 2, 1000); // [6]
+        topology.addLink(switch2.getId(), cloud.getId(), getLatency_switchtoCloudDevice(), 1000); // [6]
     }
 
-    public static void main(String[] args) throws Exception {
-		Simulation simulation = new MySimulation(10, 50,20, 500, 100);
+    public int getLatency_endDevicetoSwitch() {
+		return latency_endDevicetoSwitch;
+	}
+
+	public void setLatency_endDevicetoSwitch(int latency_endDevicetoSwitch) {
+		this.latency_endDevicetoSwitch = latency_endDevicetoSwitch;
+	}
+
+	public int getLatency_switchtoSwitch() {
+		return latency_switchtoSwitch;
+	}
+
+	public void setLatency_switchtoSwitch(int latency_switchtoSwitch) {
+		this.latency_switchtoSwitch = latency_switchtoSwitch;
+	}
+
+	public int getLatency_switchtoFogDevice() {
+		return latency_switchtoFogDevice;
+	}
+
+	public void setLatency_switchtoFogDevice(int latency_switchtoFogDevice) {
+		this.latency_switchtoFogDevice = latency_switchtoFogDevice;
+	}
+
+	public int getLatency_switchtoCloudDevice() {
+		return latency_switchtoCloudDevice;
+	}
+
+	public void setLatency_switchtoCloudDevice(int latency_switchtoCloudDevice) {
+		this.latency_switchtoCloudDevice = latency_switchtoCloudDevice;
+	}
+
+	public int getBandwith() {
+		return bandwith;
+	}
+
+	public void setBandwith(int bandwith) {
+		this.bandwith = bandwith;
+	}
+
+	public static void main(String[] args) throws Exception {
+		Simulation simulation = new MySimulation(10, 50, 20, 500, 100);
 		simulation.switchLog(false);
 		simulation.initialize();
 		
