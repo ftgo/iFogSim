@@ -15,11 +15,11 @@ import org.fog.network.Switch;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PhysicalTopology2Simulation extends Simulation {
+public class PhyTopo2Simulation extends Simulation {
     private final int edgeSwitchCount;
     private final int fogDevicePerEdgeCount;
 
-    public PhysicalTopology2Simulation(int edgeSwitchCount, int fogDevicePerEdgeCount) {
+    public PhyTopo2Simulation(int edgeSwitchCount, int fogDevicePerEdgeCount) {
         this.edgeSwitchCount = edgeSwitchCount;
         this.fogDevicePerEdgeCount = fogDevicePerEdgeCount;
     }
@@ -109,7 +109,7 @@ public class PhysicalTopology2Simulation extends Simulation {
     }
 
     public static void main(String[] args) throws Exception {
-        Simulation simulation = new PhysicalTopology2Simulation(1, 2);
+        Simulation simulation = new PhyTopo2Simulation(1, 2);
 
         simulation.switchLog(false, "PHYSICAL_TOPO");
 

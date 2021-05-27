@@ -14,7 +14,7 @@ import org.fog.network.Switch;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PhysicalTopology1Simulation extends Simulation {
+public class PhyTopo1Simulation extends Simulation {
 
     @Override
     protected void initializeLogicalComponents() {
@@ -84,7 +84,7 @@ public class PhysicalTopology1Simulation extends Simulation {
     }
 
     public static void main(String[] args) throws Exception {
-        Simulation simulation = new PhysicalTopology1Simulation();
+        Simulation simulation = new PhyTopo1Simulation();
 
         simulation.switchLog(false, "FOG_DEVICE", "SWITCH", "LINK");
 
