@@ -113,27 +113,27 @@ public class MySimulation extends Simulation {
         Switch switch0 = new EdgeSwitch("SWITCH0");
         topology.addSwitch(switch0);
 
-        topology.addLink(iot.getId(), switch0.getId(), getLatency_endDevicetoSwitch(), 1000); // [2]
+        topology.addLink(iot.getId(), switch0.getId(), getLatency_endDevicetoSwitch(), getBandwith()); // [2]
 
         FogDevice fog = fogDeviceBuilder.setCloud(false).build("FOG");
         topology.addFogDevice(fog);
 
-        topology.addLink(switch0.getId(), fog.getId(), getLatency_switchtoFogDevice(), 1000); // [3]
+        topology.addLink(switch0.getId(), fog.getId(), getLatency_switchtoFogDevice(), getBandwith()); // [3]
 
         Switch switch1 = new Switch("SWITCH1");
         topology.addSwitch(switch1);
 
-        topology.addLink(switch0.getId(), switch1.getId(), getLatency_switchtoSwitch(), 1000); // [4]
+        topology.addLink(switch0.getId(), switch1.getId(), getLatency_switchtoSwitch(), getBandwith()); // [4]
 
         Switch switch2 = new Switch("SWITCH2");
         topology.addSwitch(switch2);
 
-        topology.addLink(switch1.getId(), switch2.getId(), getLatency_switchtoSwitch(), 1000); // [5]
+        topology.addLink(switch1.getId(), switch2.getId(), getLatency_switchtoSwitch(), getBandwith()); // [5]
 
         FogDevice cloud = fogDeviceBuilder.setCloud(true).build("CLOUD");
         topology.addFogDevice(cloud);
 
-        topology.addLink(switch2.getId(), cloud.getId(), getLatency_switchtoCloudDevice(), 1000); // [6]
+        topology.addLink(switch2.getId(), cloud.getId(), getLatency_switchtoCloudDevice(), getBandwith()); // [6]
     }
 
     public int getLatency_endDevicetoSwitch() {
