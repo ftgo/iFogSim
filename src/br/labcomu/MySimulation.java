@@ -2,11 +2,13 @@ package br.labcomu;
 
 import br.labcomu.infra.FogDeviceBuilder;
 import br.labcomu.infra.Simulation;
-import org.fog.application.AppEdge;
 import org.fog.application.AppLoop;
 import org.fog.application.Application;
 import org.fog.application.selectivity.FractionalSelectivity;
-import org.fog.entities.*;
+import org.fog.entities.Actuator;
+import org.fog.entities.EndDevice;
+import org.fog.entities.FogDevice;
+import org.fog.entities.Sensor;
 import org.fog.network.EdgeSwitch;
 import org.fog.network.PhysicalTopology;
 import org.fog.network.Switch;
@@ -14,10 +16,20 @@ import org.fog.network.Switch;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MySimulation extends Simulation {
+import static org.fog.application.AppEdge.ACTUATOR;
+import static org.fog.application.AppEdge.SENSOR;
+import static org.fog.entities.Tuple.DOWN;
+import static org.fog.entities.Tuple.UP;
 
+public class MySimulation extends Simulation {
+    /*
+     * |    MODULE
+     * |      /\
+     * |     /  \
+     * |    S    A
+     */
     @Override
-    protected void initializeLogicalComponents() {
+    protected void initializeComponents() {
         Application application = getApplication();
 
         /*
@@ -28,8 +40,8 @@ public class MySimulation extends Simulation {
         /*
          * Connecting the application modules (vertices) in the application infra (directed graph) with edges
          */
-        application.addAppEdge("SENSED_DATA", "MODULE", 30000, 10 * 1024, "SENSED_DATA", Tuple.UP, AppEdge.SENSOR);
-        application.addAppEdge("MODULE", "ACTION", 1000, 1 * 1024, "ACTION", Tuple.DOWN, AppEdge.ACTUATOR);  // adding edge from Client module to Display (actuator) carrying tuples of type SELF_STATE_UPDATE
+        application.addAppEdge("SENSED_DATA", "MODULE", 30000, 10 * 1024, "SENSED_DATA", UP, SENSOR);
+        application.addAppEdge("MODULE", "ACTION", 1000, 1 * 1024, "ACTION", DOWN, ACTUATOR);  // adding edge from Client module to Display (actuator) carrying tuples of type SELF_STATE_UPDATE
 
         /*
          * Defining the input-output relationships (represented by selectivity) of the application modules.
@@ -49,8 +61,20 @@ public class MySimulation extends Simulation {
         application.setLoops(loops);
     }
 
+
+    /*
+     * |    SW2----FD1
+     * |    |
+     * |    SW1
+     * |    |
+     * |    SW0----FD0
+     * |    |
+     * |    DEV
+     * |    /\
+     * |    S A
+     */
     @Override
-    protected void initializePhysicalTopology() {
+    protected void initializeTopology() {
         Application application = getApplication();
         int userId = application.getUserId();
         String appId = application.getAppId();

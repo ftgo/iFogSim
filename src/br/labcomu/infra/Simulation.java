@@ -66,14 +66,18 @@ public abstract class Simulation implements Runnable {
 
         this.application = Application.createApplication("application", this.broker.getId());
 
-        initializeLogicalComponents();
+        initializeComponents();
 
-        initializePhysicalTopology();
+        initializeTopology();
 
+        validateTopology();
+    }
+
+    private void validateTopology() {
         PhysicalTopology topology = PhysicalTopology.getInstance();
 
         if (!topology.validateTopology())
-            throw new IllegalStateException("Topology validation Unsuccessful");
+            throw new IllegalStateException("Topology validation unsuccessful");
 
         topology.setUpEntities();
     }
@@ -173,7 +177,7 @@ public abstract class Simulation implements Runnable {
         return new ActuatorBuilder(this);
     }
 
-    protected abstract void initializeLogicalComponents();
+    protected abstract void initializeComponents();
 
-    protected abstract void initializePhysicalTopology();
+    protected abstract void initializeTopology();
 }

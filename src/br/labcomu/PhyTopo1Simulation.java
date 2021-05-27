@@ -15,9 +15,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PhyTopo1Simulation extends Simulation {
-
+    /*
+     * |    MODULE
+     * |      /\
+     * |     /  \
+     * |    S    A
+     */
     @Override
-    protected void initializeLogicalComponents() {
+    protected void initializeComponents() {
         Application application = getApplication();
 
         /*
@@ -49,8 +54,19 @@ public class PhyTopo1Simulation extends Simulation {
         application.setLoops(loops);
     }
 
+    /*
+     * |    SW2----FD1
+     * |    |
+     * |    SW1
+     * |    |
+     * |    SW0----FD0
+     * |    |
+     * |    DEV
+     * |    /\
+     * |    S A
+     */
     @Override
-    protected void initializePhysicalTopology() {
+    protected void initializeTopology() {
         FogDeviceBuilder fogDeviceBuilder = createFogDeviceBuilder();
         FogDevice fogDevice0 = fogDeviceBuilder.setCloud(false).build("FD0");
         FogDevice fogDevice1 = fogDeviceBuilder.setCloud(true).build("FD1");

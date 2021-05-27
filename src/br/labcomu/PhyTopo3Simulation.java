@@ -25,7 +25,7 @@ public class PhyTopo3Simulation extends Simulation {
     }
 
     @Override
-    protected void initializeLogicalComponents() {
+    protected void initializeComponents() {
         Application application = getApplication();
 
         /*
@@ -57,7 +57,7 @@ public class PhyTopo3Simulation extends Simulation {
     }
 
     @Override
-    protected void initializePhysicalTopology() {
+    protected void initializeTopology() {
         PhysicalTopology topology = PhysicalTopology.getInstance();
 
         FogDevice cloudFogDevice = createFogDeviceBuilder().build("CLOUD");
