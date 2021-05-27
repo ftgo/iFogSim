@@ -22,7 +22,7 @@ public class PhyTopo1Simulation extends Simulation {
      * |    S    A
      */
     @Override
-    protected void initializeComponents() {
+    protected void initializeModel() {
         Application application = getApplication();
 
         /*

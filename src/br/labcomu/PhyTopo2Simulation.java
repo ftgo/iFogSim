@@ -25,7 +25,7 @@ public class PhyTopo2Simulation extends Simulation {
     }
 
     @Override
-    protected void initializeComponents() {
+    protected void initializeModel() {
         Application application = getApplication();
 
         /*

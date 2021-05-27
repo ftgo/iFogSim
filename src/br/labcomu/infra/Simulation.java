@@ -97,7 +97,7 @@ public abstract class Simulation implements Runnable {
 
         this.application = Application.createApplication("application", this.broker.getId());
 
-        initializeComponents();
+        initializeModel();
 
         initializeTopology();
 
@@ -224,7 +224,7 @@ public abstract class Simulation implements Runnable {
         return new ActuatorBuilder(this);
     }
 
-    protected abstract void initializeComponents();
+    protected abstract void initializeModel();
 
     protected abstract void initializeTopology();
 }

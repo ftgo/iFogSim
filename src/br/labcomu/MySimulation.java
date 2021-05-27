@@ -32,7 +32,7 @@ public class MySimulation extends Simulation {
      * |    S    A
      */
     @Override
-    protected void initializeComponents() {
+    protected void initializeModel() {
         Application application = getApplication();
 
         /*

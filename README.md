@@ -34,5 +34,6 @@ git pull origin master
 # iFogSim (this fork)
 * Better build: `mvn clean install` (no `jars` needed)
 * Merged `improv` branch
+* New `Simulation` abstraction (simplicity FTW)
 * Includes our own simulation
 
