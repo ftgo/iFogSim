@@ -25,7 +25,7 @@ import org.fog.utils.TimeKeeper;
 import org.fog.utils.distribution.Distribution;
 
 public class Sensor extends SimEntity{
-	private static String LOG_TAG = "SENSOR";
+	public static final String LOG_TAG = "SENSOR";
 	
 	private int gatewayDeviceId;
 	private GeoLocation geoLocation;

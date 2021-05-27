@@ -19,7 +19,7 @@ import org.fog.entities.FogDevice;
 import org.fog.utils.Logger;
 
 public class PhysicalTopology {
-	private static String LOG_TAG = "PHYSICAL_TOPO";
+	public static final String LOG_TAG = "PHYSICAL_TOPO";
 	
 	/**
 	 * Singleton object that needs to be manipulated in the example script

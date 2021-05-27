@@ -23,7 +23,7 @@ import org.fog.utils.Logger;
  * @since iFogSim 2.0
  */
 public class Switch extends SimEntity {
-	private static String LOG_TAG = "SWITCH";
+	public static final String LOG_TAG = "SWITCH";
 	
 	/**
 	 * List of switches neighbouring this switch

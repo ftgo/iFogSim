@@ -3,14 +3,15 @@ package br.labcomu.infra;
 import org.fog.application.Application;
 import org.fog.entities.Actuator;
 
-public class ActuatorBuilder {
+import static br.labcomu.infra.Simulation.ACTUATOR_TYPE;
 
+public class ActuatorBuilder {
     private final Simulation simulation;
 
     private String actuatorType;
 
     public ActuatorBuilder(Simulation simulation) {
-        this(simulation, "ACTION");
+        this(simulation, ACTUATOR_TYPE);
     }
 
     private ActuatorBuilder(Simulation simulation, String actuatorType) {

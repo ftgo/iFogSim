@@ -1,6 +1,8 @@
 package br.labcomu;
 
+import br.labcomu.infra.ActuatorBuilder;
 import br.labcomu.infra.FogDeviceBuilder;
+import br.labcomu.infra.SensorBuilder;
 import br.labcomu.infra.Simulation;
 import org.fog.application.AppLoop;
 import org.fog.application.Application;
@@ -22,6 +24,7 @@ import static org.fog.entities.Tuple.DOWN;
 import static org.fog.entities.Tuple.UP;
 
 public class MySimulation extends Simulation {
+
     /*
      * |    MODULE
      * |      /\
@@ -35,24 +38,24 @@ public class MySimulation extends Simulation {
         /*
          * Adding modules (vertices) to the application infra (directed graph)
          */
-        application.addAppModule("MODULE", 1000, 100);
+        application.addAppModule(FOG_DEVICE_TYPE, 1000, 100);
 
         /*
          * Connecting the application modules (vertices) in the application infra (directed graph) with edges
          */
-        application.addAppEdge("SENSED_DATA", "MODULE", 30000, 10 * 1024, "SENSED_DATA", UP, SENSOR);
-        application.addAppEdge("MODULE", "ACTION", 1000, 1 * 1024, "ACTION", DOWN, ACTUATOR);  // adding edge from Client module to Display (actuator) carrying tuples of type SELF_STATE_UPDATE
+        application.addAppEdge(SENSOR_TYPE, FOG_DEVICE_TYPE, 30000, 10 * 1024, SENSOR_TYPE, UP, SENSOR);
+        application.addAppEdge(FOG_DEVICE_TYPE, ACTUATOR_TYPE, 1000, 1 * 1024, ACTUATOR_TYPE, DOWN, ACTUATOR);  // adding edge from Client module to Display (actuator) carrying tuples of type SELF_STATE_UPDATE
 
         /*
          * Defining the input-output relationships (represented by selectivity) of the application modules.
          */
-        application.addTupleMapping("MODULE", "SENSED_DATA", "ACTION", new FractionalSelectivity(1.0));
+        application.addTupleMapping(FOG_DEVICE_TYPE, SENSOR_TYPE, ACTUATOR_TYPE, new FractionalSelectivity(1.0));
 
 
         ArrayList<String> modules1 = new ArrayList<String>();
-        modules1.add("SENSED_DATA");
-        modules1.add("MODULE");
-        modules1.add("ACTION");
+        modules1.add(SENSOR_TYPE);
+        modules1.add(FOG_DEVICE_TYPE);
+        modules1.add(ACTUATOR_TYPE);
         AppLoop loop1 = new AppLoop(modules1);
 
         List<AppLoop> loops = new ArrayList<AppLoop>();
@@ -63,59 +66,65 @@ public class MySimulation extends Simulation {
 
 
     /*
-     * |    SW2----FD1
-     * |    |
-     * |    SW1
-     * |    |
-     * |    SW0----FD0
-     * |    |
-     * |    DEV
-     * |    /\
-     * |    S A
+     * |         SWITCH2 --- CLOUD
+     * |          | [5]     [6]
+     * |         SWITCH1
+     * |          | [4]
+     * |         SWITCH0 --- FOG
+     * |          | [2]     [3]
+     * |         IOT
+     * |          /\
+     * |     [0] /  \ [1]
+     * |        /    \
+     * |     SENSOR ACTUATOR
      */
     @Override
     protected void initializeTopology() {
-        Application application = getApplication();
-        int userId = application.getUserId();
-        String appId = application.getAppId();
-
-
-        FogDeviceBuilder fogDeviceBuilder = createFogDeviceBuilder();
-        FogDevice fogDevice0 = fogDeviceBuilder.setCloud(false).build("FD0");
-        FogDevice fogDevice1 = fogDeviceBuilder.setCloud(true).build("FD1");
-
-        Switch switch0 = new EdgeSwitch("SW0");
-        Switch switch1 = new Switch("SW1");
-        Switch switch2 = new Switch("SW2");
-        EndDevice endDevice = new EndDevice("DEV");
-
-        Sensor sensor = createSensorBuilder().setTransmissionInterval(5000).build("s-0"); // inter-transmission time of EEG sensor follows a deterministic distribution
-        endDevice.addSensor(sensor);
-
-        Actuator actuator = createActuatorBuilder().build("a-0");
-        endDevice.addActuator(actuator);
-
         PhysicalTopology topology = PhysicalTopology.getInstance();
+        FogDeviceBuilder fogDeviceBuilder = createFogDeviceBuilder();
+        SensorBuilder sensorBuilder = createSensorBuilder();
+        ActuatorBuilder actuatorBuilder = createActuatorBuilder();
 
-        topology.addFogDevice(fogDevice0);
-        topology.addFogDevice(fogDevice1);
-        topology.addSwitch(switch0);
-        topology.addSwitch(switch1);
-        topology.addSwitch(switch2);
+
+        EndDevice endDevice = new EndDevice("IOT");
         topology.addEndDevice(endDevice);
 
-        // Now connecting entities with Links
-        topology.addLink(endDevice.getId(), switch0.getId(), 10, 1000);
-        topology.addLink(switch0.getId(), switch1.getId(), 15, 1000);
-        topology.addLink(switch0.getId(), fogDevice0.getId(), 2, 1000);
-        topology.addLink(switch1.getId(), switch2.getId(), 20, 1000);
-        topology.addLink(switch2.getId(), fogDevice1.getId(), 2, 1000);
+        Sensor sensor = sensorBuilder.setTransmissionInterval(5000).build("SENSOR");
+        endDevice.addSensor(sensor);  // [0]
+
+        Actuator actuator = actuatorBuilder.build("ACTUATOR");
+        endDevice.addActuator(actuator); // [1]
+
+        Switch switch0 = new EdgeSwitch("SWITCH0");
+        topology.addSwitch(switch0);
+
+        topology.addLink(endDevice.getId(), switch0.getId(), 10, 1000); // [2]
+
+        FogDevice fogDevice = fogDeviceBuilder.setCloud(false).build("FOG");
+        topology.addFogDevice(fogDevice);
+
+        topology.addLink(switch0.getId(), fogDevice.getId(), 2, 1000); // [3]
+
+        Switch switch1 = new Switch("SWITCH1");
+        topology.addSwitch(switch1);
+
+        topology.addLink(switch0.getId(), switch1.getId(), 15, 1000); // [4]
+
+        Switch switch2 = new Switch("SWITCH2");
+        topology.addSwitch(switch2);
+
+        topology.addLink(switch1.getId(), switch2.getId(), 20, 1000); // [5]
+
+        FogDevice cloudDevice = fogDeviceBuilder.setCloud(true).build("CLOUD");
+        topology.addFogDevice(cloudDevice);
+
+        topology.addLink(switch2.getId(), cloudDevice.getId(), 2, 1000); // [6]
     }
 
     public static void main(String[] args) throws Exception {
         Simulation simulation = new MySimulation();
 
-        simulation.switchLog(false, "FOG_DEVICE", "SWITCH", "LINK");
+        simulation.switchLog(false, FOG_DEVICE_LOG, SWITCH_LOG, LINK_LOG, PHYSICAL_TOPOLOGY_LOG);
 
         simulation.initialize();
 

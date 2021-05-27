@@ -21,15 +21,14 @@ import org.fog.utils.Logger;
  * @since iFogSim 2.0
  */
 public class Link extends SimEntity {
+	public static final String LOG_TAG = "LINK";
 
-	private static String LOG_TAG = "LINK";
-	
 	/**
-	 * Queue holding packets to be sent North 
+	 * Queue holding packets to be sent North
 	 */
 	protected Queue<Tuple> northTupleQueue;
 	/**
-	 * Queue holding packets to be sent South 
+	 * Queue holding packets to be sent South
 	 */
 	protected Queue<Tuple> southTupleQueue;
 	/**
@@ -40,18 +39,18 @@ public class Link extends SimEntity {
 	 * Flag indicating status of South direction
 	 */
 	boolean isSouthLinkBusy;
-	
+
 	/**
 	 * Latency in milliseconds, same for both North and South directions.
 	 */
 	private double latency;
-	
+
 	/**
 	 * Bandwidth in Mbps.
 	 * If value of member = B, North BW = B and South BW = B independently.
 	 */
 	private double bandwidth;
-	
+
 	/**
 	 * ID of entity on the North end.
 	 */
@@ -60,7 +59,7 @@ public class Link extends SimEntity {
 	 * ID of entity on the South end.
 	 */
 	private int endpointSouth;
-	
+
 	public Link(String name, double latency, double bandwidth, int endpointNorth, int endpointSouth) {
 		super(name);
 		setLatency(latency);
@@ -70,7 +69,7 @@ public class Link extends SimEntity {
 		setNorthTupleQueue(new LinkedList<Tuple>());
 		setSouthTupleQueue(new LinkedList<Tuple>());
 	}
-	
+
 	public Link(String name) {
 		super(name);
 		setNorthTupleQueue(new LinkedList<Tuple>());
@@ -79,7 +78,7 @@ public class Link extends SimEntity {
 
 	@Override
 	public void startEntity() {
-		
+
 	}
 
 	@Override
@@ -95,12 +94,12 @@ public class Link extends SimEntity {
 		case FogEvents.TUPLE_ARRIVAL:
 			processTupleArrival(ev);
 			break;
-		}		
+		}
 	}
 
 	@Override
 	public void shutdownEntity() {
-		
+
 	}
 
 	/**
@@ -110,11 +109,11 @@ public class Link extends SimEntity {
 	private void processTupleArrival(SimEvent ev) {
 		Tuple tuple = (Tuple) ev.getData();
 		if (ev.getSource() == endpointNorth)  // checks if tuple was received from the North endpoint
-			sendSouth(tuple);  
+			sendSouth(tuple);
 		else if (ev.getSource() == endpointSouth)  // checks if tuple was received from the South endpoint
 			sendNorth(tuple);
 	}
-	
+
 	/**
 	 * Updates the status of South queue.
 	 */
@@ -126,9 +125,9 @@ public class Link extends SimEntity {
 			setSouthLinkBusy(false);  // if no more tuples to be sent South, mark South link as FREE
 		}
 	}
-	
+
 	/**
-	 * Send a tuple in South direction. 
+	 * Send a tuple in South direction.
 	 * Link bandwidth can be used for sending this tuple in a dedicated manner.
 	 * @param tuple Tuple to be sent
 	 */
@@ -138,11 +137,11 @@ public class Link extends SimEntity {
 		double transmissionDelay = 1000*(sizeInBits/bwInBitsPerSecond);
 		Logger.debug(LOG_TAG, "SizeInBits = "+sizeInBits);
 		Logger.debug(LOG_TAG, "Transmission delay = "+transmissionDelay );
-		setSouthLinkBusy(true); // South link has begun sending this tuple. Marking it as busy so next tuples are queued until this is sent. 
+		setSouthLinkBusy(true); // South link has begun sending this tuple. Marking it as busy so next tuples are queued until this is sent.
 		send(getId(), transmissionDelay , FogEvents.UPDATE_SOUTH_TUPLE_QUEUE);	// update South link once transmission is complete
 		send(endpointSouth, transmissionDelay  + getLatency(), FogEvents.TUPLE_ARRIVAL, tuple);	// Sent tuple arrives at other end of link after given delay
 	}
-	
+
 	/**
 	 * Send a tuple in South direction to endpoint connected at South end of link.
 	 * @param tuple Tuple to be sent
@@ -157,7 +156,7 @@ public class Link extends SimEntity {
 			}
 		}
 	}
-	
+
 	/**
 	 * Updates the status of North queue.
 	 */
@@ -169,9 +168,9 @@ public class Link extends SimEntity {
 			setNorthLinkBusy(false);  // if no more tuples to be sent North, mark North link as FREE
 		}
 	}
-	
+
 	/**
-	 * Send a tuple in North direction. 
+	 * Send a tuple in North direction.
 	 * Link bandwidth can be used for sending this tuple in a dedicated manner.
 	 * @param tuple Tuple to be sent
 	 */
@@ -184,7 +183,7 @@ public class Link extends SimEntity {
 		send(getId(), networkDelay, FogEvents.UPDATE_NORTH_TUPLE_QUEUE);  // update North link once transmission is complete
 		send(endpointNorth, networkDelay + getLatency(), FogEvents.TUPLE_ARRIVAL, tuple);  // Sent tuple arrives at other end of link after given delay
 	}
-	
+
 	/**
 	 * Send a tuple in North direction to endpoint connected at North end of link.
 	 * @param tuple Tuple to be sent
@@ -199,7 +198,7 @@ public class Link extends SimEntity {
 			}
 		}
 	}
-	
+
 	/**
 	 * Get other endpoint of the link
 	 * @param endpoint given endpoint
@@ -210,10 +209,10 @@ public class Link extends SimEntity {
 			return getEndpointSouth();
 		else if (getEndpointSouth() == endpoint)
 			return getEndpointNorth();
-		else 
+		else
 			return -1;
 	}
-	
+
 	public double getLatency() {
 		return latency;
 	}

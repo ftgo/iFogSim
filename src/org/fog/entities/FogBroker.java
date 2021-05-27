@@ -50,7 +50,7 @@ public class FogBroker extends PowerDatacenterBroker{
 		}
 	}
 
-	private static final String LOG_TAG = "FOG_BROKER";
+	public static final String LOG_TAG = "FOG_BROKER";
 	
 	List<Integer> fogDeviceIds;
 	List<Integer> sensorIds;

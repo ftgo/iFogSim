@@ -26,7 +26,7 @@ public class SensorBuilder {
     private DistributionFactory distributionFactory;
 
     public SensorBuilder(Simulation simulation) {
-        this(simulation, "SENSED_DATA", new DeterministicDistributionFactory(), 100);
+        this(simulation, Simulation.SENSOR_TYPE, new DeterministicDistributionFactory(), 100);
     }
 
     private SensorBuilder(Simulation simulation, String tupleType, DistributionFactory distributionFactory, int transmissionInterval) {
@@ -57,7 +57,7 @@ public class SensorBuilder {
         int userId = application.getUserId();
         String appId = application.getAppId();
 
-        Sensor sensor = new Sensor(name, this.tupleType, userId, appId, this.distributionFactory.create(this.transmissionInterval), application);
+        Sensor sensor = new Sensor(name, this.tupleType, userId, appId, this.distributionFactory.create(this.transmissionInterval), application); // inter-transmission time of EEG sensor follows a deterministic distribution
 
         this.simulation.addSensor(sensor);
 

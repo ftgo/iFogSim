@@ -8,7 +8,9 @@ import org.fog.entities.Actuator;
 import org.fog.entities.FogBroker;
 import org.fog.entities.FogDevice;
 import org.fog.entities.Sensor;
+import org.fog.network.Link;
 import org.fog.network.PhysicalTopology;
+import org.fog.network.Switch;
 import org.fog.placement.ModulePlacementOnlyCloud;
 import org.fog.utils.Logger;
 import org.fog.utils.TimeKeeper;
@@ -19,6 +21,26 @@ import java.util.Collection;
 import java.util.List;
 
 public abstract class Simulation implements Runnable {
+
+    public static final String SENSOR_LOG = Sensor.LOG_TAG;
+
+    public static final String ACTUATOR_LOG = Actuator.LOG_TAG;
+
+    public static final String FOG_BROKER_LOG = FogBroker.LOG_TAG;
+
+    public static final String FOG_DEVICE_LOG = FogDevice.LOG_TAG;
+
+    public static final String PHYSICAL_TOPOLOGY_LOG = PhysicalTopology.LOG_TAG;
+
+    public static final String SWITCH_LOG = Switch.LOG_TAG;
+
+    public static final String LINK_LOG = Link.LOG_TAG;
+
+    public static final String FOG_DEVICE_TYPE = "FOG_DEVICE_TYPE"; // MODULE
+
+    public static final String ACTUATOR_TYPE = "ACTUATOR_TYPE"; // ACTION
+
+    public static final String SENSOR_TYPE = "SENSOR_TYPE"; // SENSED_DATA
 
     private FogBroker broker;
 
@@ -32,6 +54,15 @@ public abstract class Simulation implements Runnable {
 
     private boolean running;
 
+    /**
+     * SENSOR_LOG
+     * ACTUATOR_LOG
+     * FOG_BROKER_LOG
+     * FOG_DEVICE_LOG
+     * PHYSICAL_TOPOLOGY_LOG
+     * SWITCH_LOG
+     * LINK_LOG
+     */
     public void switchLog(boolean isEnable, String... exceptTags) {
         Logger.ENABLED = isEnable;
         for (String exceptTag : exceptTags) {
@@ -165,14 +196,30 @@ public abstract class Simulation implements Runnable {
         this.running = false;
     }
 
+    /**
+     * isCloud = true
+     * mips = 102400
+     * ram = 4000
+     * ratePerMips = 0.01
+     * busyPower = 103.0
+     * idlePower = 83.25
+     */
     public FogDeviceBuilder createFogDeviceBuilder() {
         return new FogDeviceBuilder(this);
     }
 
+    /**
+     * tupleType = SENSOR_TYPE
+     * distributionFactory = DeterministicDistributionFactory
+     * transmissionInterval = 100
+     */
     public SensorBuilder createSensorBuilder() {
         return new SensorBuilder(this);
     }
 
+    /**
+     * actuatorType = ACTUATOR_TYPE
+     */
     public ActuatorBuilder createActuatorBuilder() {
         return new ActuatorBuilder(this);
     }
