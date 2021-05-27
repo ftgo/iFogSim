@@ -85,24 +85,24 @@ public class MySimulation extends Simulation {
         SensorBuilder sensorBuilder = createSensorBuilder();
         ActuatorBuilder actuatorBuilder = createActuatorBuilder();
 
-        EndDevice endDevice = new EndDevice("IOT");
-        topology.addEndDevice(endDevice);
+        EndDevice iot = new EndDevice("IOT");
+        topology.addEndDevice(iot);
 
-        Sensor sensor = sensorBuilder.setTransmissionInterval(5000).build("x");
-        endDevice.addSensor(sensor);  // [0]
+        Sensor sensorX = sensorBuilder.setTransmissionInterval(5000).build("x");
+        iot.addSensor(sensorX);  // [0]
 
-        Actuator actuator = actuatorBuilder.build("x");
-        endDevice.addActuator(actuator); // [1]
+        Actuator actuatorX = actuatorBuilder.build("x");
+        iot.addActuator(actuatorX); // [1]
 
         Switch switch0 = new EdgeSwitch("SWITCH0");
         topology.addSwitch(switch0);
 
-        topology.addLink(endDevice.getId(), switch0.getId(), 10, 1000); // [2]
+        topology.addLink(iot.getId(), switch0.getId(), 10, 1000); // [2]
 
-        FogDevice fogDevice = fogDeviceBuilder.setCloud(false).build("FOG");
-        topology.addFogDevice(fogDevice);
+        FogDevice fog = fogDeviceBuilder.setCloud(false).build("FOG");
+        topology.addFogDevice(fog);
 
-        topology.addLink(switch0.getId(), fogDevice.getId(), 2, 1000); // [3]
+        topology.addLink(switch0.getId(), fog.getId(), 2, 1000); // [3]
 
         Switch switch1 = new Switch("SWITCH1");
         topology.addSwitch(switch1);
@@ -114,10 +114,10 @@ public class MySimulation extends Simulation {
 
         topology.addLink(switch1.getId(), switch2.getId(), 20, 1000); // [5]
 
-        FogDevice cloudDevice = fogDeviceBuilder.setCloud(true).build("CLOUD");
-        topology.addFogDevice(cloudDevice);
+        FogDevice cloud = fogDeviceBuilder.setCloud(true).build("CLOUD");
+        topology.addFogDevice(cloud);
 
-        topology.addLink(switch2.getId(), cloudDevice.getId(), 2, 1000); // [6]
+        topology.addLink(switch2.getId(), cloud.getId(), 2, 1000); // [6]
     }
 
     public static void main(String[] args) throws Exception {
