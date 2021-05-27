@@ -1,8 +1,6 @@
 package br.labcomu;
 
-import br.labcomu.infra.ActuatorBuilder;
 import br.labcomu.infra.FogDeviceBuilder;
-import br.labcomu.infra.SensorBuilder;
 import br.labcomu.infra.Simulation;
 import org.fog.application.AppEdge;
 import org.fog.application.AppLoop;
@@ -53,28 +51,19 @@ public class PhysicalTopology1Simulation extends Simulation {
 
     @Override
     protected void initializePhysicalTopology() {
-        Application application = getApplication();
-        int userId = application.getUserId();
-        String appId = application.getAppId();
-
-
-        FogDevice fogDevice0 = new FogDeviceBuilder().setCloud(false).build("FD0");
-        addFogDevice(fogDevice0);
-
-        FogDevice fogDevice1 = new FogDeviceBuilder().build("FD1");
-        addFogDevice(fogDevice1);
+        FogDeviceBuilder fogDeviceBuilder = createFogDeviceBuilder();
+        FogDevice fogDevice0 = fogDeviceBuilder.setCloud(false).build("FD0");
+        FogDevice fogDevice1 = fogDeviceBuilder.setCloud(true).build("FD1");
 
         Switch switch0 = new EdgeSwitch("SW0");
         Switch switch1 = new Switch("SW1");
         Switch switch2 = new Switch("SW2");
         EndDevice endDevice = new EndDevice("DEV");
 
-        Sensor sensor = new SensorBuilder().setTransmissionInterval(5000).build("s-0", application); // inter-transmission time of EEG sensor follows a deterministic distribution
-        addSensor(sensor);
+        Sensor sensor = createSensorBuilder().setTransmissionInterval(5000).build("s-0"); // inter-transmission time of EEG sensor follows a deterministic distribution
         endDevice.addSensor(sensor);
 
-        Actuator actuator = new ActuatorBuilder().build("a-0", application);
-        addActuator(actuator);
+        Actuator actuator = createActuatorBuilder().build("a-0");
         endDevice.addActuator(actuator);
 
         PhysicalTopology topology = PhysicalTopology.getInstance();

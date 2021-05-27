@@ -59,14 +59,9 @@ public class PhysicalTopology2Simulation extends Simulation {
 
     @Override
     protected void initializePhysicalTopology() {
-        Application application = getApplication();
-        int userId = application.getUserId();
-        String appId = application.getAppId();
-
         PhysicalTopology topology = PhysicalTopology.getInstance();
 
-        FogDevice cloudFogDevice = new FogDeviceBuilder().build("CLOUD");
-        addFogDevice(cloudFogDevice);
+        FogDevice cloudFogDevice = createFogDeviceBuilder().build("CLOUD");
         topology.addFogDevice(cloudFogDevice);
 
         Switch datacenterSwitch = new Switch("DC_SW");
@@ -80,13 +75,12 @@ public class PhysicalTopology2Simulation extends Simulation {
 
 
         // true, 102400, 4000, 0.01, 103.0, 83.25
-        FogDeviceBuilder fogDeviceBuilder = new FogDeviceBuilder().setCloud(false).setMips(10240).setRam(2000);
-        SensorBuilder sensorBuilder = new SensorBuilder().setTransmissionInterval(50);
-        ActuatorBuilder actuatorBuilder = new ActuatorBuilder();
+        FogDeviceBuilder fogDeviceBuilder = createFogDeviceBuilder().setCloud(false).setMips(10240).setRam(2000);
+        SensorBuilder sensorBuilder = createSensorBuilder().setTransmissionInterval(50);
+        ActuatorBuilder actuatorBuilder = createActuatorBuilder();
 
         for (int i = 0; i < this.edgeSwitchCount; i++) {
             FogDevice iFogDevice = fogDeviceBuilder.build("FD-" + i);
-            addFogDevice(iFogDevice);
             topology.addFogDevice(iFogDevice);
 
             Switch iSwitch = new Switch("SW-" + i);
@@ -102,12 +96,10 @@ public class PhysicalTopology2Simulation extends Simulation {
                 String suffix = i + "-" + j;
                 EndDevice endDevice = new EndDevice("END_DEV-" + suffix);
 
-                Sensor sensor = sensorBuilder.build("s-" + suffix, application);
-                addSensor(sensor);
+                Sensor sensor = sensorBuilder.build("s-" + suffix);
                 endDevice.addSensor(sensor);
 
-                Actuator actuator = actuatorBuilder.build("a-" + suffix, application);
-                addActuator(actuator);
+                Actuator actuator = actuatorBuilder.build("a-" + suffix);
                 endDevice.addActuator(actuator);
 
                 topology.addEndDevice(endDevice);

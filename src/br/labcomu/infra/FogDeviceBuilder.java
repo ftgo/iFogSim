@@ -19,6 +19,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class FogDeviceBuilder {
+    private final Simulation simulation;
+
     private boolean isCloud;
     private long mips;
     private int ram;
@@ -26,11 +28,13 @@ public class FogDeviceBuilder {
     private double busyPower;
     private double idlePower;
 
-    public FogDeviceBuilder() {
-        this(true, 102400, 4000, 0.01, 103.0, 83.25);
+    public FogDeviceBuilder(Simulation simulation) {
+        this(simulation, true, 102400, 4000, 0.01, 103.0, 83.25);
     }
 
-    private FogDeviceBuilder(boolean isCloud, long mips, int ram, double ratePerMips, double busyPower, double idlePower) {
+    private FogDeviceBuilder(Simulation simulation, boolean isCloud, long mips, int ram, double ratePerMips, double busyPower, double idlePower) {
+        this.simulation = simulation;
+
         this.isCloud = isCloud;
         this.mips = mips;
         this.ram = ram;
@@ -109,6 +113,9 @@ public class FogDeviceBuilder {
         try {
             // TODO Check about scheduling interval
             FogDevice fogDevice = new FogDevice(name, characteristics, new AppModuleAllocationPolicy(hostList), storageList, 10, this.ratePerMips);
+
+            this.simulation.addFogDevice(fogDevice);
+
             return fogDevice;
         } catch (Exception e) {
             throw new IllegalArgumentException(e);

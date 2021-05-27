@@ -5,13 +5,16 @@ import org.fog.entities.Actuator;
 
 public class ActuatorBuilder {
 
+    private final Simulation simulation;
+
     private String actuatorType;
 
-    public ActuatorBuilder() {
-        this("ACTION");
+    public ActuatorBuilder(Simulation simulation) {
+        this(simulation, "ACTION");
     }
 
-    private ActuatorBuilder(String actuatorType) {
+    private ActuatorBuilder(Simulation simulation, String actuatorType) {
+        this.simulation = simulation;
         this.actuatorType = actuatorType;
     }
 
@@ -20,11 +23,15 @@ public class ActuatorBuilder {
         return this;
     }
 
-    public Actuator build(String name, Application application) {
+    public Actuator build(String name) {
+        Application application = this.simulation.getApplication();
+
         int userId = application.getUserId();
         String appId = application.getAppId();
 
         Actuator actuator = new Actuator(name, userId, appId, this.actuatorType, application);
+
+        this.simulation.addActuator(actuator);
 
         return actuator;
     }

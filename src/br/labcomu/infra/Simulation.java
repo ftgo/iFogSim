@@ -161,6 +161,18 @@ public abstract class Simulation implements Runnable {
         this.running = false;
     }
 
+    public FogDeviceBuilder createFogDeviceBuilder() {
+        return new FogDeviceBuilder(this);
+    }
+
+    public SensorBuilder createSensorBuilder() {
+        return new SensorBuilder(this);
+    }
+
+    public ActuatorBuilder createActuatorBuilder() {
+        return new ActuatorBuilder(this);
+    }
+
     protected abstract void initializeLogicalComponents();
 
     protected abstract void initializePhysicalTopology();
