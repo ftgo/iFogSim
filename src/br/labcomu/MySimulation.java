@@ -131,27 +131,27 @@ public class MySimulation extends Simulation {
         Switch switch0 = new EdgeSwitch("SWITCH0");
         topology.addSwitch(switch0);
 
-        topology.addLink(iot.getId(), switch0.getId(), (int) this.latency_iot_switch0, (int) this.bandwidth); // [2]
+        topology.addLink(iot.getId(), switch0.getId(), this.latency_iot_switch0, this.bandwidth); // [2]
 
         FogDevice fog = fogDeviceBuilder.setCloud(false).build("FOG");
         topology.addFogDevice(fog);
 
-        topology.addLink(switch0.getId(), fog.getId(), (int) this.latency_switch0_fog, (int) this.bandwidth); // [3]
+        topology.addLink(switch0.getId(), fog.getId(), this.latency_switch0_fog, this.bandwidth); // [3]
 
         Switch switch1 = new Switch("SWITCH1");
         topology.addSwitch(switch1);
 
-        topology.addLink(switch0.getId(), switch1.getId(), (int) this.latency_switch0_switch1, (int) this.bandwidth); // [4]
+        topology.addLink(switch0.getId(), switch1.getId(), this.latency_switch0_switch1, this.bandwidth); // [4]
 
         Switch switch2 = new Switch("SWITCH2");
         topology.addSwitch(switch2);
 
-        topology.addLink(switch1.getId(), switch2.getId(), (int) this.latency_switch1_switch2, (int) this.bandwidth); // [5]
+        topology.addLink(switch1.getId(), switch2.getId(), this.latency_switch1_switch2, this.bandwidth); // [5]
 
         FogDevice cloud = fogDeviceBuilder.setCloud(true).build("CLOUD");
         topology.addFogDevice(cloud);
 
-        topology.addLink(switch2.getId(), cloud.getId(), (int) this.latency_switch2_cloud, (int) this.bandwidth); // [6]
+        topology.addLink(switch2.getId(), cloud.getId(), this.latency_switch2_cloud, this.bandwidth); // [6]
     }
 
     public static void main(String[] args) throws Exception {
@@ -174,7 +174,7 @@ public class MySimulation extends Simulation {
                 1000.0
         );
 
-        simulation.switchLog(false);
+        simulation.switchLog(false, SENSOR_LOG, ACTUATOR_LOG, FOG_BROKER_LOG, FOG_DEVICE_LOG, PHYSICAL_TOPOLOGY_LOG, SWITCH_LOG, LINK_LOG);
 
         simulation.initialize();
 
